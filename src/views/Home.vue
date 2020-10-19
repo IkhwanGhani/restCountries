@@ -1,43 +1,55 @@
 <template>
   <v-container>
-    <v-toolbar flat class="transparent">
-      <v-text-field
-        v-model="search"
-        prepend-inner-icon="mdi-magnify"
-        placeholder="Search"
-        hide-details
-        solo
-      ></v-text-field>
+    <v-row>
+      <v-col cols="12" sm="5">
+        <v-text-field
+          v-model="search"
+          prepend-inner-icon="mdi-magnify"
+          placeholder="Search for a country..."
+          hide-details
+          solo
+        ></v-text-field>
+      </v-col>
       <v-spacer></v-spacer>
-      <v-select
-        v-model="selectedRegion"
-        :items="regionItems"
-        label="Filter by region"
-        hide-details
-        solo
-      ></v-select>
-    </v-toolbar>
-    <v-row class="pa-4">
+      <v-col cols="12" sm="4" md="3" lg="2">
+        <v-select
+          v-model="selectedRegion"
+          :items="regionItems"
+          label="Filter by region"
+          hide-details
+          solo
+        ></v-select>
+      </v-col>
+    </v-row>
+    <v-row>
       <v-col
         cols="12"
+        sm="6"
         md="3"
-        lg="3"
-        xl="3"
-        v-for="(i, x) in filterRegion"
-        :key="x"
+        v-for="(item, index) in filterCountry"
+        :key="index"
       >
         <v-row>
           <v-col>
-            <v-card elevation="10">
-              <router-link :to="`/details/${i.name}`">
-                <v-img :aspect-ratio="16 / 9" :src="i.flag"></v-img>
-              </router-link>
-              <v-card-text class="text-xs-h6 font-weight-black">{{
-                i.name
-              }}</v-card-text>
-              <v-card-text>{{ i.population }}</v-card-text>
-              <v-card-text>{{ i.region }}</v-card-text>
-              <v-card-text>{{ i.capital }}</v-card-text>
+            <v-card elevation="10" @click="getDetail(item.name)">
+              <v-img :aspect-ratio="16 / 9" :src="item.flag"></v-img>
+              <v-card-title class="font-weight-bold my-4">
+                <h5>{{ item.name }}</h5>
+              </v-card-title>
+              <v-card-text>
+                <p>
+                  <span class="font-weight-bold">Population : </span>
+                  <span>{{ item.population }}</span>
+                </p>
+                <p>
+                  <span class="font-weight-bold">Region : </span>
+                  <span>{{ item.region }}</span>
+                </p>
+                <p>
+                  <span class="font-weight-bold">Capital : </span>
+                  <span>{{ item.capital }}</span>
+                </p>
+              </v-card-text>
             </v-card>
           </v-col>
         </v-row>
@@ -47,33 +59,19 @@
 </template>
 
 <script>
-import axios from "axios";
-
 export default {
   data() {
     return {
-      selectedRegion: "All Countries",
+      selectedRegion: "",
       search: "",
       listCountryDetails: [],
       regionItems: [
-        {
-          text: "All Countries",
-        },
-        {
-          text: "Africa",
-        },
-        {
-          text: "Americas",
-        },
-        {
-          text: "Asia",
-        },
-        {
-          text: "Europe",
-        },
-        {
-          text: "Oceania",
-        },
+        "All Region",
+        "Africa",
+        "Americas",
+        "Asia",
+        "Europe",
+        "Oceania",
       ],
     };
   },
@@ -81,33 +79,35 @@ export default {
     getCountryAll() {
       axios
         .get(
-          `https://restcountries.eu/rest/v2/all?fields=flag;name;population;region;capital`
+          `/rest/v2/all?fields=flag;name;population;region;capital;alpha3Code`
         )
         .then((response) => {
-          console.log(response.data);
           this.listCountryDetails = response.data;
         })
         .catch((e) => {
           console.log(e);
         });
     },
+    getDetail(name) {
+      this.$router.push({ path: `/details/${name}` });
+    },
   },
   computed: {
-    filterRegion() {
-      if (this.selectedRegion == "All Countries" && this.search == "") {
+    filterCountry() {
+      if (this.selectedRegion == "All Region" && this.search == "") {
         return this.listCountryDetails;
       }
-      if (this.selectedRegion != "All Countries" && this.search == "") {
+      if (this.selectedRegion != "All Region" && this.search == "") {
         return this.listCountryDetails.filter((item) =>
           item.region.toLowerCase().includes(this.selectedRegion.toLowerCase())
         );
       }
-      if (this.selectedRegion == "All Countries" && this.search != "") {
+      if (this.selectedRegion == "All Region" && this.search != "") {
         return this.listCountryDetails.filter((item) =>
           item.name.toLowerCase().includes(this.search.toLowerCase())
         );
       }
-      if (this.selectedRegion != "All Countries" && this.search != "") {
+      if (this.selectedRegion != "All Region" && this.search != "") {
         return this.listCountryDetails.filter(
           (item) =>
             item.region

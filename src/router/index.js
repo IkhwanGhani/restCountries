@@ -7,23 +7,15 @@ export default new Router({
   mode: "history",
   base: process.env.BASE_URL,
   routes: [
-    // HOME
     {
       path: "/",
       name: "Home",
       component: () => import("@/views/Home.vue"),
     },
-    // LANDING PAGE
     {
-      path: "/about",
-      name: "About",
-      component: () => import("@/views/About"),
-    },
-    // TEST
-    {
-      path: "/test",
-      name: "Test Page",
-      component: () => import("@/views/Test"),
+      path: "/details/:name",
+      name: "Detail",
+      component: () => import("@/views/Detail"),
     },
     // UNIDENTIFIED PAGE REQUEST
     {
